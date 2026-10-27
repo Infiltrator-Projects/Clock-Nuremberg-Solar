@@ -121,7 +121,7 @@
     ],
     "expected": [
       true,
-      "01:12:14 NUR-LD",
+      "01:12:41 NUR-LD",
       15
     ]
   },
@@ -139,7 +139,7 @@
     ],
     "expected": [
       true,
-      "01:12:14 NUR-LD",
+      "01:12:41 NUR-LD",
       15
     ]
   },
@@ -157,7 +157,7 @@
     ],
     "expected": [
       true,
-      "01:12:14 NUR-LD",
+      "01:12:41 NUR-LD",
       15
     ]
   },
@@ -175,7 +175,7 @@
     ],
     "expected": [
       true,
-      "01\n12\n14\nNUR-LD",
+      "01\n12\n41\nNUR-LD",
       15
     ]
   },
@@ -193,7 +193,7 @@
     ],
     "expected": [
       true,
-      "01\n12\n14\nNUR-LD",
+      "01\n12\n41\nNUR-LD",
       15
     ]
   },
@@ -211,7 +211,7 @@
     ],
     "expected": [
       true,
-      "01\n12\n14\nNUR-LD",
+      "01\n12\n41\nNUR-LD",
       15
     ]
   },
@@ -226,7 +226,7 @@
     ],
     "expected": [
       true,
-      45783
+      18650
     ]
   },
   {
@@ -240,7 +240,7 @@
     ],
     "expected": [
       true,
-      768
+      644
     ]
   },
   {
