@@ -134,8 +134,6 @@ typedef struct SeasonalPeriod {
 
 static bool nuremberg_local_hour_allocation(int64_t unix_microseconds,
                                             double latitude,
-                                            unsigned *day_hours,
-                                            unsigned *night_hours,
                                             long double *day_start,
                                             long double *day_end)
 {
@@ -144,8 +142,7 @@ static bool nuremberg_local_hour_allocation(int64_t unix_microseconds,
     long double rounded;
     unsigned day_count;
 
-    if (day_hours == NULL || night_hours == NULL ||
-        day_start == NULL || day_end == NULL ||
+    if (day_start == NULL || day_end == NULL ||
         !solar_day_boundaries(
             unix_microseconds, latitude, 0.833, &dawn, &dusk)) {
         return false;
@@ -157,8 +154,6 @@ static bool nuremberg_local_hour_allocation(int64_t unix_microseconds,
     if (rounded > 16.0L) rounded = 16.0L;
     day_count = (unsigned)rounded;
 
-    *day_hours = day_count;
-    *night_hours = 24U - day_count;
     *day_start =
         ((long double)(24U - day_count) / 2.0L) * SECONDS_PER_HOUR;
     *day_end = *day_start +
@@ -173,19 +168,13 @@ static bool format_nuremberg_hours(char *buffer,
                                    int64_t unix_microseconds,
                                    bool show_seconds,
                                    bool vertical,
-                                   bool historical,
                                    double latitude,
                                    double longitude)
 {
-    (void)historical;
-    
-    unsigned day_hours;
-    unsigned night_hours;
     long double day_start;
     long double day_end;
-    const double clock_longitude = longitude;
     const long double solar =
-        apparent_solar_seconds(unix_microseconds, clock_longitude);
+        apparent_solar_seconds(unix_microseconds, longitude);
     long double elapsed;
     int hour;
     int minute;
@@ -196,7 +185,7 @@ static bool format_nuremberg_hours(char *buffer,
 
     ok = nuremberg_local_hour_allocation(
             unix_microseconds, latitude,
-            &day_hours, &night_hours, &day_start, &day_end);
+            &day_start, &day_end);
     if (!ok) {
         return write_text(buffer, capacity, length,
                           vertical ? "N/A\nNUR" : "N/A NUR");
@@ -211,8 +200,6 @@ static bool format_nuremberg_hours(char *buffer,
             : (long double)SECONDS_PER_DAY - day_end + solar;
         suffix = "NUR-LN";
     }
-    (void)day_hours;
-    (void)night_hours;
 
     hour = (int)floorl(elapsed / SECONDS_PER_HOUR);
     minute = (int)floorl(
@@ -249,35 +236,6 @@ static bool mode_location_valid(const InfiltratrTemporalClockModeInfo *info,
 }
 
 
-/* Names are transliterated proper names, not animal/help labels. Wording
- * belongs to the selected language; the shared phase calculation stays below. */
-#define CLOCK_REMAINING_WORDS(hour, watch, twelfth, twelfths) \
-    { "hour", hour }, { "watch", watch }, \
-    { "twelfth", twelfth }, { "twelfths", twelfths }
-#define JAPANESE_BRANCHES \
-    { "jp-ne", "Ne" }, { "jp-ushi", "Ushi" }, { "jp-tora", "Tora" }, \
-    { "jp-u", "U" }, { "jp-tatsu", "Tatsu" }, { "jp-mi", "Mi" }, \
-    { "jp-uma", "Uma" }, { "jp-hitsuji", "Hitsuji" }, { "jp-saru", "Saru" }, \
-    { "jp-tori", "Tori" }, { "jp-inu", "Inu" }, { "jp-i", "I" }
-#define JAPANESE_NATIVE_BRANCHES \
-    { "jp-ne", "子" }, { "jp-ushi", "丑" }, { "jp-tora", "寅" }, \
-    { "jp-u", "卯" }, { "jp-tatsu", "辰" }, { "jp-mi", "巳" }, \
-    { "jp-uma", "午" }, { "jp-hitsuji", "未" }, { "jp-saru", "申" }, \
-    { "jp-tori", "酉" }, { "jp-inu", "戌" }, { "jp-i", "亥" }
-#define EDO_WORDS(horizontal, vertical) \
-    { "edo", horizontal }, { "edo-vertical", vertical }
-
-
-#undef CLOCK_REMAINING_WORDS
-#undef JAPANESE_BRANCHES
-#undef JAPANESE_NATIVE_BRANCHES
-#undef EDO_WORDS
-
-#define CLOCK_CATALOG(locale, entries) \
-    { locale, entries, sizeof(entries) / sizeof((entries)[0]) }
-
-#undef CLOCK_CATALOG
-
 
 static bool format_clock_mode(const InfiltratrI18n *language,
                                            const char *mode,
@@ -292,7 +250,7 @@ static bool format_clock_mode(const InfiltratrI18n *language,
                                            size_t capacity,
                                            size_t *length)
 {
-    (void)language; (void)mode;
+    (void)language;
     const InfiltratrTemporalClockModeInfo *info;
 
     // The extension modes use absolute instants and, when applicable, the
@@ -314,19 +272,12 @@ static bool format_clock_mode(const InfiltratrI18n *language,
         return false;
     }
 
-    ;
 
-    ;
 
-    ;
 
-    {
-        return format_nuremberg_hours(
-            buffer, capacity, length, unix_microseconds,
-            show_seconds, vertical, false, latitude, longitude);
-    }
-
-    return false;
+    return format_nuremberg_hours(
+        buffer, capacity, length, unix_microseconds,
+        show_seconds, vertical, latitude, longitude);
 }
 
 static bool seasonal_format_clock_mode(const char *mode,
@@ -335,7 +286,6 @@ static bool seasonal_format_clock_mode(const char *mode,
     double latitude, double longitude,
     char *buffer, size_t capacity, size_t *length)
 {
-    (void)mode;
     return format_clock_mode(NULL, mode, unix_microseconds, utc_offset_seconds,
         show_seconds, vertical, location_configured, latitude, longitude,
         buffer, capacity, length);
