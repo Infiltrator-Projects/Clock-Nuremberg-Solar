@@ -1,0 +1,14 @@
+{
+  "title": "Nuremberg Style Solar Clock",
+  "intro": "This modern location-aware reconstruction adopts the Nuremberg-style day/night counting scheme but derives the daily allocation from local solar geometry instead of the city's fixed historical turning days.",
+  "structure": "Round the computed daylight length to the nearest whole hour and restrict the day allocation to 8–16 hours. The rest belongs to night. Both intervals use equal ordinary hours. NUR-LD counts from day start; NUR-LN counts from night start. Scheduled boundaries are centred on apparent noon, not necessarily the exact sunrise and sunset.",
+  "example": "A calculated daylight length of 13 hours 40 minutes gives a 14-hour day allocation. Day starts at 05:00 and ends at 19:00 apparent solar time. At apparent noon the display is 07:00 NUR-LD; at midnight it is 05:00 NUR-LN.",
+  "history": "This profile adapts the historical principle of separate day and night counts to the selected location. It deliberately does not reproduce the 1488 civic Wendetag schedule.",
+  "model": "Compute daylight from solar declination, latitude and a 0.833-degree horizon correction. Round floor(daylight hours + 0.5), clamp to 8–16, and set boundaries to (24-N)/2 and (24+N)/2. Compute local apparent solar time with east-positive longitude and equation of time. Floor elapsed hours, minutes and optional seconds, and search for the next changed display.",
+  "limits": "Requires valid coordinates. Missing solar crossings produce N/A; invalid location fails. This is a compact modern solar approximation, not a historical Nuremberg clock record. Time zones and daylight saving do not determine the boundaries.",
+  "sources": [
+    "Implementation: https://github.com/Infiltrator-Projects/Clock-Nuremberg-Solar/blob/main/src/provider.c",
+    "Model evidence: https://github.com/Infiltrator-Projects/Clock-Nuremberg-Solar/blob/main/docs/MODEL.md",
+    "Shared contract: https://github.com/Infiltrator-Projects/Libraries/blob/main/docs/TEMPORAL_PROVIDERS.md"
+  ]
+}
